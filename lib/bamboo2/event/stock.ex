@@ -25,7 +25,7 @@ defmodule Bamboo2.Event.Stock do
     IO.inspect(trace_list)
 
     # check if is up to 10
-    if length(trace_list) == 2, do: send(self(), {:completed, :normal})
+    if length(trace_list) == 10, do: send(self(), {:completed, :normal})
 
     # check if trace_id already exist
     if Enum.member?(trace_list, trace_id) == true do
