@@ -17,9 +17,10 @@ defmodule Bamboo2.Application do
       # Start Finch
       {Finch, name: Bamboo2.Finch},
       # Start the Endpoint (http/https)
-      Bamboo2Web.Endpoint
+      Bamboo2Web.Endpoint,
       # Start a worker by calling: Bamboo2.Worker.start_link(arg)
       # {Bamboo2.Worker, arg}
+      Bamboo2.Event.Stock
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
