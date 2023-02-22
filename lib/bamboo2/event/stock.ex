@@ -25,7 +25,7 @@ defmodule Bamboo2.Event.Stock do
     trace_id = response["headers"]["X-Amzn-Trace-Id"]
 
     # check if is up to 10, the count start from index 0
-    if length(trace_list) == 1, do: send(self(), {:completed, :normal})
+    if length(trace_list) == 9, do: send(self(), {:completed, :normal})
 
     # check if trace_id already exist
     if Enum.member?(trace_list, trace_id) == true do
