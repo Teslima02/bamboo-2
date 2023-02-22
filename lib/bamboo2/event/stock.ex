@@ -5,6 +5,7 @@ defmodule Bamboo2.Event.Stock do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  @impl true
   def init(trace_list) do
     Process.flag(:trap_exit, true)
 
@@ -18,14 +19,13 @@ defmodule Bamboo2.Event.Stock do
     {:ok, event}
   end
 
+  @impl true
   def handle_cast({:insert, event}, %{trace_list: trace_list} = state) do
     {:ok, response} = Poison.decode(event)
     trace_id = response["headers"]["X-Amzn-Trace-Id"]
 
-    IO.inspect(trace_list)
-
-    # check if is up to 10
-    if length(trace_list) == 10, do: send(self(), {:completed, :normal})
+    # check if is up to 10, the count start from index 0
+    if length(trace_list) == 1, do: send(self(), {:completed, :normal})
 
     # check if trace_id already exist
     if Enum.member?(trace_list, trace_id) == true do
@@ -33,15 +33,15 @@ defmodule Bamboo2.Event.Stock do
     else
       new_list = [trace_id | trace_list]
 
-    {:noreply, %{state | trace_list: new_list}}
+      {:noreply, %{state | trace_list: new_list}}
     end
   end
 
+  @impl true
   def handle_info({:completed, reason}, state) do
+    IO.inspect(state.trace_list)
     IO.inspect("Task complete shutdown process")
-
-    # Process.exit(self(), :shutdown)
-    exit(reason)
+    {:stop, reason, state}
   end
 
   def handle_info(:check_provider, state) do
@@ -55,8 +55,9 @@ defmodule Bamboo2.Event.Stock do
   end
 
   @impl true
-  def terminate(reason, state) do
+  def terminate(_reason, _state) do
     IO.inspect("terminate state")
+    System.stop
   end
 
   defp network_call do
